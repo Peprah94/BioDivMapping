@@ -32,7 +32,7 @@ sapply(list.files("functions", full.names = TRUE), source)
 # Import species list
 focalTaxa <- read.csv(paste0(folderName, "/focalTaxa.csv"), header = T)
 focalTaxa <- focalTaxa[focalTaxa$include,]
-redList <- readRDS(paste0(folderName, "/redList.RDS"))
+redList <- readRDS(paste0(tempFolderName, "/redList.RDS"))
 
 # Import datasets
 regionGeometry <- readRDS(paste0(folderName, "/regionGeometry.RDS"))

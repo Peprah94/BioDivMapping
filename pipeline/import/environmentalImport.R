@@ -12,6 +12,7 @@ library(terra)
 library(sf)
 library(fasterize)
 library(digest)  # create hash of raster CRS and projection for saving
+library(rvest) #for html_attr function to run
 
 # Import local functions
 sapply(list.files("functions", full.names = TRUE), source)
@@ -80,6 +81,7 @@ baseRaster <- terra::rast(extent = ext(regionGeometryBuffer), res = res, crs = p
 parameterList <- list()
 
 for (parameter in seq_along(selectedParameters)) {
+  print(parameter)
   focalParameter <- selectedParameters[parameter]
   
   ### 1. Check if the data needs to be downloaded externally.

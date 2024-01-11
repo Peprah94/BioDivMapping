@@ -45,7 +45,14 @@ if(file.exists(paste0(folderName, "/focalTaxa.csv"))){
 }
 
 # Refine focal taxon
+#Either manually select the species you want by their indices or change it in their folder.
+if(is.null(focalTaxonIndex)){
 focalTaxon <- focalTaxon[focalTaxon$include,]
+} else {
+ focalTaxon$include <- rep(FALSE, nrow(focalTaxon))
+ focalTaxon$include[focalTaxonIndex] <- rep(TRUE, length(focalTaxonIndex))
+ focalTaxon <- focalTaxon[focalTaxon$include,]
+}
 
 # get missing keys
 missingKey <- is.na(focalTaxon$key) & focalTaxon$level != "polyphyla"

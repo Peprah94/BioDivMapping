@@ -27,8 +27,8 @@ sapply(list.files("functions", full.names = TRUE, recursive = TRUE), source)
 # pointsExample <- c(4.641979, 57.97976, 31.05787, 71.18488)
 # names(pointsExample) <- c("north", "south", "east", "west")
 
-level <- "country"
-region <- "Norway"
+level <- "county"
+region <- "50"
 
 crs <- 25833  # as accepted by sf::st_crs()
 res <- 1000 # resolution in units of CRS (eg m in UTM, or degrees in lat/long)
@@ -38,16 +38,29 @@ res <- 1000 # resolution in units of CRS (eg m in UTM, or degrees in lat/long)
 # FALSE here.
 
 scheduledDownload <- TRUE
-waitForGbif <- FALSE
+waitForGbif <- TRUE
+
+dateAccessed <- "2024-01-10"
+if(!exists("dateAccessed")){
+  focalTaxonIndex <- c(4, 14)
+} else {
+  focalTaxonIndex <- NULL
+}
+
+
 source("pipeline/import/taxaImport.R")
 
 # Next we run the environmental import script, which brings in a set of rasters that apply to the region
 # we defined in the last step.
 
-myMesh <- list(cutoff = 25000, max.edge=c(109000, 120000), offset= 80000)
+#cut off increases the mesh points.
+#myMesh <- list(cutoff = 25000, max.edge=c(109000, 120000), offset= 80000)
+myMesh <- list(cutoff = 250, max.edge=c(109000, 120000), offset= 8000)
+
 mesh <- meshTest(myMesh, regionGeometry, print = T, crs = crs) |>
   inlaMeshToSf()
 
+# To successfully run the next code, make sure you have downloaded the CORINE land cover dataset from https://land.copernicus.eu/en/products/corine-land-cover/clc2018
 source("pipeline/import/environmentalImport.R")
 
 # Next we start on data processing, which adds extra information to our datasets.
