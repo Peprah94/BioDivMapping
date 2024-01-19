@@ -26,6 +26,11 @@ if (!exists("dateAccessed")) {
   dateAccessed <- as.character(Sys.Date())
 }
 
+if (!exists("environmentalCovariateIndex")) {
+  environmentalCovariateIndex <- NULL
+}
+
+
 # Add folder name
 folderName <- paste0("data/run_", dateAccessed)
 tempFolderName <- paste0(folderName, "/temp")
@@ -41,7 +46,15 @@ if(file.exists(paste0(folderName, "/focalCovariates.csv"))){
   write.csv(parameters, paste0(folderName, "/focalCovariates.csv"), row.names = FALSE)
 }
 
-selectedParameters <- parameters$parameters[parameters$selected]
+if(is.null(environmentalCovariateIndex)){
+  selectedParameters <- parameters$parameters[parameters$selected]
+} else {
+  parameters$selected <- rep(FALSE, nrow(parameters))
+  parameters$selected[environmentalCovariateIndex] <- rep(TRUE, length(environmentalCovariateIndex))
+  selectedParameters <- parameters$parameters[parameters$selected]
+}
+
+#selectedParameters <- parameters$parameters[parameters$selected]
 
 # Check that any parameters we're downloading externally have a source
 emptyParameters <- parameters$parameters[parameters$external & parameters$dataSource == ""]

@@ -40,13 +40,15 @@ res <- 1000 # resolution in units of CRS (eg m in UTM, or degrees in lat/long)
 scheduledDownload <- TRUE
 waitForGbif <- TRUE
 
-dateAccessed <- "2024-01-10"
+dateAccessed <- "2024-01-19"
 if(!exists("dateAccessed")){
-  focalTaxonIndex <- c(4, 14)
+  focalTaxonIndex <- c(1, 4, 14)
+
 } else {
   focalTaxonIndex <- NULL
 }
 
+environmentalCovariateIndex <- c(1:4)
 
 source("pipeline/import/taxaImport.R")
 
