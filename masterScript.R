@@ -48,7 +48,7 @@ if(!exists("dateAccessed")){
   focalTaxonIndex <- NULL
 }
 
-environmentalCovariateIndex <- c(1:4)
+environmentalCovariateIndex <- c(1:2, 7, 21, 22)
 
 source("pipeline/import/taxaImport.R")
 
@@ -67,7 +67,7 @@ source("pipeline/import/environmentalImport.R")
 
 # Next we start on data processing, which adds extra information to our datasets.
 
-redListThreshold <- 30
+redListThreshold <- 5
 source("pipeline/integration/speciesDataProcessing.R")
 
 # We then run our models. NOTE: This is the point where defining a Mesh becomes important. You can read
