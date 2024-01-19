@@ -12,7 +12,6 @@ library(terra)
 library(sf)
 library(fasterize)
 library(digest)  # create hash of raster CRS and projection for saving
-library(rvest) #for html_attr function to run
 
 # Import local functions
 sapply(list.files("functions", full.names = TRUE), source)
@@ -80,58 +79,27 @@ baseRaster <- terra::rast(extent = ext(regionGeometryBuffer), res = res, crs = p
 # download environmental data
 parameterList <- list()
 
-for (parameter in seq_along(selectedParameters)) {
-  print(parameter)
+for(parameter in seq_along(selectedParameters)) {
+  rasterisedVersion <- NULL
   focalParameter <- selectedParameters[parameter]
   
   ### 1. Check if the data needs to be downloaded externally.
   external <- parameters$external[parameters$parameters == focalParameter]
   
-  if (external) {
+  if(external) {
     dataSource <- parameters$dataSource[parameters$parameters == focalParameter]
     
     ### 2. Check whether we have previously downloaded a version of the external data that encompasses the area we need.
-    raster_found <- FALSE
-    if(dir.exists(paste0("data/temp/", dataSource))){
-      ## List all files in the directory that match the parameter
-      file_list <- list.files(path = paste0("data/temp/", dataSource), 
-                              pattern = paste0(focalParameter, "_.*\\.tiff$"), 
-                              full.names = TRUE)
-      # Check files
-      for (file in file_list) {
-        rast <- rast(file)
-        if (isSubset(regionGeometryBuffer, rast)) {
-          rasterisedVersion <- rast
-          raster_found <- TRUE
-          cat(sprintf("Raster for '%s' encompassing region found and imported successfully!\n",
-                      focalParameter))
-          break
-        } 
-      }   
+    dataPath <- paste0("data/temp/", dataSource)
+    if(dir.exists(dataPath)){
+      rasterisedVersion <- checkAndImportRast(focalParameter, regionGeometryBuffer, dataPath)
       # 3. Create new temp folder to download necessary external data.
     } else {
-      dir.create(paste0("data/temp/", dataSource))
+      dir.create(dataPath)
     }
-    if (!raster_found) {
+    if(is.null(rasterisedVersion)) {
       # download file
       source(paste0("pipeline/import/utils/defineEnvSource.R"))
-      # get info to save
-      info <- crs(rasterisedVersion, describe = T)
-      if(!is.na(info$authority)){
-        ext <- ext(rasterisedVersion)
-        info <- sprintf("%s%s_X%s_%s_Y%s_%s",
-                        info$authority, info$code, 
-                        ext[1], ext[2], ext[3], ext[4])
-      } else {
-        info <- digest(list(crs(rasterisedVersion), ext(rasterisedVersion)))
-      }
-      #  Construct the filename and save with raster information
-      file_path <- sprintf("data/temp/%s/%s_%s.tiff",
-                           dataSource,focalParameter, info)
-      x <- rasterisedVersion
-      if(!file.exists(file_path)){
-        writeRaster(x, filename = file_path, overwrite = TRUE)
-      }
     }
   } else {
     rasterisedVersion <- rast(paste0("data/external/environmentalCovariates/",focalParameter, ".tiff"))
@@ -143,16 +111,16 @@ for (parameter in seq_along(selectedParameters)) {
 parametersCropped <- parameterList |> 
   lapply(function(x) {
     # Crop each covariate to extent of regionGeometryBuffer
-    out <- crop(x, as.polygons(project(regionGeometryBuffer, x), extent = TRUE), snap = "out", mask = TRUE)
+    out <- terra::crop(x, as.polygons(terra::project(regionGeometryBuffer, x), extent = TRUE), snap = "out", mask = TRUE)
     # Project all rasters to baseRaster and combine
     if(is.factor(x)) {
       # project categorical rasters
-      out <- project(out, baseRaster, method = "mode")
+      out <- terra::project(out, baseRaster, method = "mode")
       levels(out) <- levels(x)  # reassign levels 
       out
     } else {
       # project & scale continuous rasters
-      project(out, baseRaster) |>
+      terra::project(out, baseRaster) |>
         scale()  
     }}) |>  
   rast() |>  # combine raster layers
@@ -177,7 +145,6 @@ agg <- function(x, fact){
 parametersAggregated <- sapp(x = parametersCropped, fun = agg, fact = 2) |>
   crop(baseRaster)
 
-writeRaster(parametersAggregated, "visualisation/hotspotMaps/data/covariateDataList.tiff", overwrite=TRUE)
 writeRaster(parametersAggregated, paste0("data/run_", dateAccessed,"/environmentalDataImported.tiff"), overwrite=TRUE)
 
 
