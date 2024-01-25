@@ -57,7 +57,7 @@ source("pipeline/import/taxaImport.R")
 
 #cut off increases the mesh points.
 #myMesh <- list(cutoff = 25000, max.edge=c(109000, 120000), offset= 80000)
-myMesh <- list(cutoff = 250, max.edge=c(109000, 120000), offset= 8000)
+myMesh <- list(cutoff = 25000, max.edge=c(109000, 120000), offset= 80000)
 
 mesh <- meshTest(myMesh, regionGeometry, print = T, crs = crs) |>
   inlaMeshToSf()

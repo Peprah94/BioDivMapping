@@ -1,0 +1,4 @@
+"taxa","key","level","scientificName","include","functionalGroup"
+"amphibiansReptiles",11592253,"class","Squamata",TRUE,NA
+"beetles",1470,"order","Coleoptera",TRUE,NA
+"butterfliesMoths",797,"order","Lepidoptera",TRUE,NA

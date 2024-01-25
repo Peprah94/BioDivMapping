@@ -19,6 +19,7 @@ refineSpeciesData <- function(modelRun, speciesData) {
   if (modelRun %in% c("redListRichness", "redListSpecies")) {
     
     # Select either all red list species or only those with enough occurrences
+    # there is no valid in my redlist construction
     redListSelection <- if(modelRun %in% c("redListSpecies")) redList$valid else rep(TRUE, nrow(redList))
     speciesForSelection <- redList$GBIFName[redListSelection]
     

@@ -34,7 +34,7 @@ sapply(list.files("functions", full.names = TRUE), source)
 # Import species list
 focalTaxa <- read.csv(paste0(folderName, "/focalTaxa.csv"), header = T)
 focalTaxa <- focalTaxa[focalTaxa$include,]
-redList <- readRDS(paste0(tempFolderName, "/redList.RDS"))
+redList <- readRDS(paste0(folderName, "/redList.RDS"))
 
 # Import datasets
 regionGeometry <- readRDS(paste0(folderName, "/regionGeometry.RDS"))
@@ -89,8 +89,15 @@ for (i in 1:length(names(workflowList))) {
   workflow$specifySpatial(prior.range = c(300000, 0.05),
                           prior.sigma = c(500, 0.2)) #100
   workflow$workflowOutput(modelOutputs)
-  workflow$modelOptions(INLA = list(num.threads = 12, control.inla=list(int.strategy = 'eb', cmin = 0),safe = TRUE),
-                        Richness = list(predictionIntercept = 'ANOData'))
+  if(!modelRun %in% c("richness", "redListRichness")){
+  workflow$modelOptions(INLA = list(num.threads = 12, control.inla=list(int.strategy = 'eb', cmin = 0),safe = TRUE)#,
+                       # Richness = list(predictionIntercept = 'ANOData')
+                        )
+  } else {
+    workflow$modelOptions(INLA = list(num.threads = 12, control.inla=list(int.strategy = 'eb', cmin = 0),safe = TRUE),
+                          Richness = list(predictionIntercept = 'ANOData')
+    )  
+  }
   
   # Add bias fields if necessary
   if (!is.null(biasFieldList[[i]])) {
