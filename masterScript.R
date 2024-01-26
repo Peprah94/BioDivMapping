@@ -40,7 +40,7 @@ res <- 1000 # resolution in units of CRS (eg m in UTM, or degrees in lat/long)
 scheduledDownload <- TRUE
 waitForGbif <- TRUE
 
-dateAccessed <- "2024-01-19"
+dateAccessed <- "2024-01-24"
 if(!exists("dateAccessed")){
   focalTaxonIndex <- c(1, 4, 14)
 
@@ -48,6 +48,8 @@ if(!exists("dateAccessed")){
   focalTaxonIndex <- NULL
 }
 
+#at the moment, I am subsetting the index of covariates I want to use for the predictions
+# I prefer this than going into the csv file to turn on and off
 environmentalCovariateIndex <- c(1:2, 7, 21, 22)
 
 source("pipeline/import/taxaImport.R")
