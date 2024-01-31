@@ -94,6 +94,7 @@ for (i in 1:length(names(workflowList))) {
                        # Richness = list(predictionIntercept = 'ANOData')
                         )
   } else {
+    # predictionIntercept should be a dataset with representative data
     workflow$modelOptions(INLA = list(num.threads = 12, control.inla=list(int.strategy = 'eb', cmin = 0),safe = TRUE),
                           Richness = list(predictionIntercept = 'ANOData')
     )  
